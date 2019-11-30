@@ -1,0 +1,4 @@
+*.pyc
+*.swp
+config.json
+config.json_old

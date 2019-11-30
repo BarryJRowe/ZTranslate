@@ -1,0 +1,13 @@
+"echo $(($(date +%s%N)/1000000)) > /tmp/ztranslate_keygrab_capt"
+    m:0x14 + c:49
+    Control+Mod2 + grave
+
+"echo $(($(date +%s%N)/1000000)) > /tmp/ztranslate_keygrab_prev"
+    m:0x14 + c:10
+    Control+Mod2 + 1
+
+
+"echo $(($(date +%s%N)/1000000)) > /tmp/ztranslate_keygrab_next"
+    m:0x14 + c:11
+    Control+Mod2 + 2
+

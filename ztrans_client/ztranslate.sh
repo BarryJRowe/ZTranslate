@@ -1,0 +1,2 @@
+xbindkeys
+./startup

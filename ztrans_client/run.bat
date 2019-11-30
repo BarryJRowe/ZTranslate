@@ -1,0 +1,1 @@
+..\..\python2\python.exe .\startup.py
