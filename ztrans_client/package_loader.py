@@ -5,17 +5,16 @@ import base64
 import time
 import copy
 from bson import json_util
+from ztrans_common.file_package import FilePackageDirectDAO
 
-
-class PackageObject:
+class PackageObject(FilePackageDirectDAO):
     def __init__(self, filename=None, file_or_string=None):
       try:
+        super(PackageObject, self).__init__("", "", font="", filename=filename)
+        
         #on windows, zipfile only seems to work for filename inputs and not file objects
-        if filename:
-            the_package_file = filename
-        else:
-            pass
-
+        return
+        """
         self.the_package_zip = zipfile.ZipFile(the_package_file, "r")
         self.info = json.loads(self.the_package_zip.read("info.json"))
         self.zip_name_list = self.the_package_zip.namelist()
@@ -44,11 +43,13 @@ class PackageObject:
                 ff.close() 
 
         self.variables = dict()
+        """
       except:
         import traceback
         traceback.print_exc()
         raise
 
+    """
     def is_index_disabled(self, name):
         return self.index_is_disabled.get(name, False)
 
@@ -63,13 +64,12 @@ class PackageObject:
         #pdb.set_trace()
         return self.indexes
 
-
     def set_variable(self, variable, value):
         self.variables[variable] = value
 
     def get_variable(self, variable):
         return self.variables.get(variable, "")
-
+    
     def load_pipeline_index(self, index_type, index_name, full_name):  
         index_split = base64.b32decode(index_name.rpartition(".")[0]).split("_")
         index_vars = list()
@@ -105,7 +105,7 @@ class PackageObject:
 
     def load_meta(self, name, full_name):
         self.metas[name] = self.load_index_data_by_name(full_name)
-
+    
     def get_meta_data(self, name):
         return self.metas.get(name, {})
 
@@ -117,13 +117,11 @@ class PackageObject:
                     del self.indexes[algo][tup][pc]
                 self.indexes[algo][tup]
             del self.indexes[algo]
-
+    
     def find_by_query(self, db_query):
         def recur_checker(i, index):
-            
             output = list()
             if i < len(checker):
-
                 for key in index:
                     if checker[i][2] == None:
                         output.extend(recur_checker(i+1, index[key]))
@@ -137,7 +135,6 @@ class PackageObject:
                                 break
                         else:
                             output.extend(recur_checker(i+1, index[key]))
-
             else:
                 output.extend(index)
             return output
@@ -204,7 +201,7 @@ class PackageObject:
         else:
             results = list()
         return results
-
+    """
     #rewrite this function
     def find_data_by_values(self, algo, hsv, pc):
         output = list()

@@ -90,7 +90,7 @@ class OCRPipeline:
         org_org_image = org_image.copy()
         draw = ImageDraw.Draw(org_image)
         new_data = list()
-        
+        print "AAAAAAAAAAAAAAAAAAAAAA"
         box_non_overlap = list()
         for entry in data:
             #go through and select the best matches for boxes that are overlapping..."
@@ -117,7 +117,6 @@ class OCRPipeline:
                 else:
                     #the new one (entry) is worse, so mark it as a non-match and leave it
                     entry['match'] = False
-
         for entry in data:
             if entry.get("match") == True:
                 if target_lang != None and entry['block']['source_text'] and\
@@ -453,7 +452,7 @@ class PipelineColorFill(PipelineAction):
 class PipelineIndexHSV(PipelineAction):
     @classmethod
     def index_hsv(cls, data, ops):
-        tolerance = cls.resolve_var(ops.get('tolerenace', 0.5), data)
+        tolerance = cls.resolve_var(ops.get('tolerance', 0.05), data)
         if "x1" in ops:
             x1,y1,x2,y2 = [cls.resolve_var(ops[c], data) for c in\
                                                        ['x1','y1', 'x2', 'y2']]
@@ -489,7 +488,7 @@ class PipelineIndexHSV(PipelineAction):
 class PipelineIndexPixelCount(PipelineAction):
     @classmethod
     def index_pixel_count(cls, data, ops):
-        tolerance = cls.resolve_var(ops['tolerenace'], data)     
+        tolerance = cls.resolve_var(ops['tolerance'], data)     
         pixel_count = data['meta']['pixel_count']
 
         if 'index' not in data['meta']:
@@ -588,6 +587,12 @@ class PipelineIndexOCR(PipelineAction):
         for ii, entry in enumerate(docs):
             text_value = entry['text']
             if text_value:
+                #fix the box coords if degenerate
+                if entry['box'][2]<= entry['box'][0]:
+                    entry['box'][2] = entry['box'][0]+1
+                if entry['box'][3] <= entry['box'][1]:
+                    entry['box'][3] = entry['box'][1]+1               
+
                 data_doc = {"box": entry['box'], "image": data['image'].crop(entry['box']),
                         "text": entry['text'], "type": "line", "sub_num": ii}
                 sub_id = "ocr_"+str(curr_number)+"_"+str(ii)
@@ -603,8 +608,9 @@ class PipelineIndexOCR(PipelineAction):
                     "tol": tolerance
                 }
                 data['meta']['index'].append(index_block)
-
+    
         new_data = copy.deepcopy(data)
+        
         data = new_data
         data['meta']['containing'] = True
         data['meta']['miss'] = miss
@@ -992,6 +998,7 @@ class PipelineDiffImage(PipelineAction):
             output['match'] = False
         return [output]
 
+
 class PipelineGetTextBlocks(PipelineAction):
     @classmethod
     def get_text_blocks(cls, data, ops):
@@ -1037,6 +1044,7 @@ class PipelineGetTextBlocks(PipelineAction):
                 d['meta']['dont_crop'] = True
                 output.append(d)
         return output
+
  
 class PipelineFuzzyDiffImage(PipelineAction):
     @classmethod
@@ -1163,8 +1171,6 @@ class PipelineDiffTextDetect(PipelineAction):
             output['match'] = True
             output['l_dist'] = sum(f_dists)
         return [output]
-
-
 
 
 

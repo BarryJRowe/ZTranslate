@@ -151,7 +151,9 @@ def tess_helper_linux(image, lang=None, mode=None, min_pixels=1):
 
     config_arg = ""
     if mode is not None:
-        config_arg += " --oem 0 --psm "+str(mode)
+        #config_arg += " --oem 0 --psm "+str(mode)
+        config_arg += " --psm "+str(mode)
+
 
     if not config_arg:
         config_arg = ""

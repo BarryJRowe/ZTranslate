@@ -493,7 +493,7 @@ class MainWindow():
             try:
                 self.package_object = package_loader.PackageObject(filename) 
             except:
-                tkMessageBox.showinfo("Error", "Package '"+filename+"' could not be loaded.  Is it in use by another program?") 
+                tkMessageBox.showinfo("Error", "Package '"+filename+"' could not be loaded.  Is it being used by another program?") 
                 self.top_ui_package_name_var = "(None)"
                 self.top_ui_mode.set("Normal")
                 return
@@ -538,9 +538,17 @@ class MainWindow():
             author_v = info.get("author", "")
             # - Version
             version_v = info.get("version", "")
+            # - API Version
+            api_version_v = info.get("api_version", "0.1")
             # - Description
             description_v = info.get("version", "")
             # - Source language
+
+            """
+            image_object = Image.open("/home/barry/Downloads/silber_test2.png")
+            self.grabbed_images.append(image_object)       
+            self.call_screenshoter()
+            """
 
             # - Target language
             #screen_width = self.package_info_window.winfo_screenwidth()
@@ -551,11 +559,16 @@ class MainWindow():
             author = ttk.Label(piw, text=author_v).grid(row=1, column=1, columnspan=1,sticky="W")
             version_l = ttk.Label(piw, text="Version:").grid(row=2, column=0, sticky="W")
             version = ttk.Label(piw, text=version_v).grid(row=2, column=1, columnspan=1,sticky="W")
+
+            api_version_l = ttk.Label(piw, text="API Version:").grid(row=3, column=0, sticky="W")
+            api_version = ttk.Label(piw, text=api_version_v).grid(row=3, column=1, columnspan=1,sticky="W")
+
+
             #source_l = ttk.Label(piw, text="Source Language:").grid(row=3, column=0, sticky="W")
             #source = ttk.Label(piw, text="(De)").grid(row=3, column=1, columnspan=1, sticky="W")
             #target_l = ttk.Label(piw, text="Target Language:").grid(row=4, column=0, sticky="W")
             #target = ttk.Label(piw, text="(En)").grid(row=4, column=1, columnspan=1,sticky="W")
-            #spacker:
+            #spacer:
             ttk.Label(piw, text="").grid(row=5)
 
             desc_l = ttk.Label(piw, text="Description:").grid(row=6, column=0, sticky="W")

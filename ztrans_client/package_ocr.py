@@ -1,9 +1,9 @@
 import time
 import json
 from PIL import Image, ImageDraw
-from util import load_image
 from pipeline_general_service import PipelineGeneralService
 from ztrans_common import text_draw
+from ztrans_common.image_util import load_image
 
 
 running_textboxes = list()    

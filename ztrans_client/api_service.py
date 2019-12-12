@@ -6,8 +6,9 @@ import config
 import threading
 import httplib
 import functools
-from util import load_image, image_to_string, fix_neg_width_height,\
-                 image_to_string_bmp
+from ztrans_common.image_util import load_image, image_to_string, \
+                                     fix_neg_width_height, \
+                                     image_to_string_format
 import screen_translate
 import imaging
 import package_ocr
@@ -103,7 +104,7 @@ class APIHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             if pixel_format == "BGR": 
                 image_result = image_result.convert("RGB")
                 image_result = swap_red_blue(image_result)
-            result = {"image": image_to_string_bmp(image_result)}
+            result = {"image": image_to_string_format(image_result, "BMP")}
             return result
         elif config.local_server_api_key_type == "ztranslate":
             print "ZTRANS"
@@ -131,7 +132,7 @@ class APIHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             if pixel_format == "BGR": 
                 image_result = image_result.convert("RGB")
                 image_result = swap_red_blue(image_result)
-            result = {"image": image_to_string_bmp(image_result)}
+            result = {"image": image_to_string_format(image_result, "BMP")}
             if window_obj:
                 if quota:
                     window_obj.update_quota(quota)
@@ -167,7 +168,7 @@ class APIHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 output_image = output_image.convert("RGB")
                 output_image = swap_red_blue(output_image)
 
-            return {"image": image_to_string_bmp(output_image)}
+            return {"image": image_to_string_format(output_image, "BMP")}
 
     def google_ocr(self, image_data, source_lang, ocr_api_key):
         doc = {

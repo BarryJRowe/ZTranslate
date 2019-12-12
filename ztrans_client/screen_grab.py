@@ -32,6 +32,7 @@ mock_grab = [
 class ImageGrabber:
     @classmethod
     def grab_image(cls,*args, **kwargs):
+        return Image.open("/home/barry/Downloads/silber_test2.png")
         if os.name == "nt":
             grabbed_image = cls.grab_image_windows(*args,  **kwargs)
         else:

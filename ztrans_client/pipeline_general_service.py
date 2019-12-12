@@ -38,15 +38,17 @@ def main():
     game_id = ""
     font = "./fonts/Roboto-Bold.ttf"
 
-    package = FilePackageDirectDAO(user_id, game_id, font, "/home/barry/Downloads/aaa.ztp")
-    image = Image.open("/home/barry/Downloads/silber_test1.png")
+    package = FilePackageDirectDAO(user_id, game_id, font, "/home/barry/Downloads/bbb.ztp")
+    image1 = Image.open("/home/barry/Downloads/silber_test1.png")
+    image2 = Image.open("/home/barry/Downloads/silber_test2.png")
+
+    out, data = PipelineGeneralService.run_ocr_pipeline(image1, package, "en")
     import pdb
     pdb.set_trace()
-    print 'ttt'
-    out, data = PipelineGeneralService.run_ocr_pipeline(image, package, "en")
+    out, data = PipelineGeneralService.run_ocr_pipeline(image2, package, "en")
     import pdb
     pdb.set_trace()
-    
+   
 
 if __name__=='__main__':
     main()
