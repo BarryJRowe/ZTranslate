@@ -2,6 +2,9 @@ import os
 from PIL import Image
 import time
 import datetime
+import imaging
+import pyautogui
+import config
 
 if os.name == 'nt':
     try:
@@ -28,11 +31,9 @@ mock_grab = [
 ["default_images/napple_tale.jpg",'ja']
 ]
 
-
 class ImageGrabber:
     @classmethod
     def grab_image(cls,*args, **kwargs):
-        return Image.open("/home/barry/Downloads/silber_test2.png")
         if os.name == "nt":
             grabbed_image = cls.grab_image_windows(*args,  **kwargs)
         else:
@@ -59,11 +60,14 @@ class ImageGrabber:
 
     @classmethod
     def grab_image_windows(cls):
-        #print "grabbing images in windows..."
-        #hwnd = win32gui.FindWindow(None, 'Calculator')
+        if config.capture_mode == "fast":
+            return cls.grab_image_windows_fast()
+        else:
+            return cls.grab_image_windows_accurate()
+
+    @classmethod
+    def grab_image_windows_fast(cls):
         hwnd = win32gui.GetForegroundWindow()
-        # Change the line below depending on whether you want the whole window
-        # or just the client area. 
         try:
             left, top, right, bot = win32gui.GetClientRect(hwnd)
             #left, top, right, bot = win32gui.GetWindowRect(hwnd)
@@ -96,17 +100,33 @@ class ImageGrabber:
             saveDC.DeleteDC()
             mfcDC.DeleteDC()
             win32gui.ReleaseDC(hwnd, hwndDC)
-
+            print ("aaaa", result)
             if result == 1:
                 #PrintWindow Succeeded
                 try:
                     im.save("grab.bmp")
                 except:
-                    pass
+                    import traceback
+                    traceback.print_exc()
                 return im
+            
             return im
         except:
+            import traceback
+            traceback.print_exc()
             return None
 
+    @classmethod
+    def grab_image_windows_accurate(cls):
+        hwnd = win32gui.GetForegroundWindow()
+        if hwnd:
+            win32gui.SetForegroundWindow(hwnd)
+            x, y, x1, y1 = win32gui.GetClientRect(hwnd)
+            x, y = win32gui.ClientToScreen(hwnd, (x, y))
+            x1, y1 = win32gui.ClientToScreen(hwnd, (x1 - x, y1 - y))
+            im = pyautogui.screenshot(region=(x, y, x1, y1))
+            return im
+        else:
+            print('Window not found!')
 
 

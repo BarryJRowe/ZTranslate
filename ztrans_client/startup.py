@@ -22,13 +22,13 @@ import package_ocr
 import api_service
 import key_input
 
-from ztrans_common import text_draw
-
 def donothing():
-   filewin = Toplevel(root)
-   button = Button(filewin, text="Do nothing button")
-   button.pack()
-
+    try:
+        filewin = Toplevel(root)
+        button = Button(filewin, text="Do nothing button")
+        button.pack()
+    except:
+        print("Do nothing error")
 
 DEFAULT_IMAGE_PATH = "default.png"
 
@@ -75,6 +75,10 @@ class MainWindow():
 
         self.add_events()
 
+    def show_about(self):
+        about_string = "ZTranslate by Barry Rowe\n\nhttps://ztranslate.net\n\nVersion: "+config.version_string
+        tkMessageBox.showinfo("ZTranslate",about_string)
+
     def set_window_basics(self):
         self.last_resize = time.time()
         self.should_resize = False
@@ -108,16 +112,24 @@ class MainWindow():
         self.filemenu.add_command(label="Exit", command=self.on_quit)
         self.menubar.add_cascade(label="File", menu=self.filemenu)
         #####################
-        self.settingsmenu = Menu(self.menubar, tearoff=0)
-        self.settingsmenu.add_command(label="Key Binds", command=self.key_binds)
-        self.settingsmenu.add_command(label="API Key", command=self.api_key)
+        """
+        self.editmenu = Menu(self.menubar, tearoff=0)
+        self.editmenu.add_command(label="Undo", command=donothing)
 
-        self.menubar.add_cascade(label="Settings", menu=self.settingsmenu)
+        self.editmenu.add_separator()
+        
+        self.editmenu.add_command(label="Cut", command=donothing)
+        self.editmenu.add_command(label="Copy", command=donothing)
+        self.editmenu.add_command(label="Paste", command=donothing)
+        self.editmenu.add_command(label="Delete", command=donothing)
+        self.editmenu.add_command(label="Select All", command=donothing)
+
+        self.menubar.add_cascade(label="Edit", menu=self.editmenu)
+        """
         ######################
         self.helpmenu = Menu(self.menubar, tearoff=0)
         self.helpmenu.add_command(label="Help Index", command=donothing)
-        self.helpmenu.add_command(label="About...", command=donothing)
-
+        self.helpmenu.add_command(label="About", command=self.show_about)
         self.menubar.add_cascade(label="Help", menu=self.helpmenu)
 
         self.root.config(menu=self.menubar)        
@@ -186,7 +198,7 @@ class MainWindow():
         self.top_ui_source_lang_desc = ttk.Label(self.mainframe, text="Source Language:")
         self.top_ui_source_lang_desc.grid(row=2, column=0, sticky="W")
 
-        self.top_ui_source_lang = ttk.Combobox(self.mainframe, width=4)
+        self.top_ui_source_lang = ttk.Combobox(self.mainframe, width=5)
         self.top_ui_source_lang['values'] = ["Auto"]+langs_possible
         self.top_ui_source_lang['state'] = 'readonly'
         self.top_ui_source_lang.set("Auto")
@@ -225,10 +237,26 @@ class MainWindow():
         self.top_ui_screenkey_desc.grid(row=3, column=0, sticky="W")
         self.top_ui_screenkey_var = StringVar()
         self.top_ui_screenkey_entry = ttk.Entry(self.mainframe, width=3, textvariable=self.top_ui_screenkey_var)
-        self.top_ui_screenkey_var.set("~")
+        self.top_ui_screenkey_var.set(config.ascii_capture)
+
+        self.top_ui_screenkey_entry.bind("<KeyRelease>", self.update_screencap_key)
+
+
         self.top_ui_screenkey_entry.grid(row=3, column=1, sticky='W')
         self.top_ui_screenkey_entry.grid_configure(padx=10, pady=5) 
 
+        self.top_ui_capture_mode_desc = ttk.Label(self.mainframe, text="Capture mode:")
+        self.top_ui_capture_mode_desc.grid(row=3, column=2, sticky="W")
+
+        self.top_ui_capture_mode = ttk.Combobox(self.mainframe, width=8)
+        self.top_ui_capture_mode['values'] = ["Fast", "Accurate"]
+        self.top_ui_capture_mode['state'] = 'readonly'
+        self.top_ui_capture_mode.bind('<<ComboboxSelected>>', self.set_capture_mode_callback)
+        self.top_ui_capture_mode.set(config.capture_mode.title())
+        self.top_ui_capture_mode.grid(row=3, column=3, sticky='W')
+        self.top_ui_capture_mode.grid_configure(padx=10, pady=5)
+
+        """
         self.top_ui_screenkey_prev_var = StringVar()
         self.top_ui_screenkey_prev_entry = ttk.Entry(self.mainframe, width=3, textvariable=self.top_ui_screenkey_prev_var)
         self.top_ui_screenkey_prev_var.set("1")
@@ -240,9 +268,17 @@ class MainWindow():
         self.top_ui_screenkey_next_var.set("2")
         self.top_ui_screenkey_next_entry.grid(row=3, column=2, sticky='W')
         self.top_ui_screenkey_next_entry.grid_configure(padx=10, pady=5) 
-
+        """
         #keep screenshots (moved to menu options)
  
+    def set_capture_mode_callback(self, event):
+        mode = event.widget.get().lower()
+        config.set_config("capture_mode", mode)
+
+    def update_screencap_key(self, event):
+        config.set_config("ascii_capture", event.char)
+        self.top_ui_screenkey_var.set(event.char)
+
     def add_image_section(self):
         if self.curr_image == None:
             self.load_image(DEFAULT_IMAGE_PATH)
@@ -277,7 +313,7 @@ class MainWindow():
         self.img_org = image_object.copy()
 
         w = self.w - 5
-        h = self.h - 145
+        h = self.h - 140
 
         if w < 640:
             w = 640
@@ -315,7 +351,7 @@ class MainWindow():
 
 
     def resizing_window(self, event):       
-        if event.width >= 645 and event.height >= 545:
+        if event.width >= 645 and event.height >= 535:
             self.should_resize = True
             self.w = event.width
             self.h = event.height
@@ -493,7 +529,7 @@ class MainWindow():
             try:
                 self.package_object = package_loader.PackageObject(filename) 
             except:
-                tkMessageBox.showinfo("Error", "Package '"+filename+"' could not be loaded.  Is it being used by another program?") 
+                tkMessageBox.showinfo("Error", "Package '"+filename+"' could not be loaded.  Is it in use by another program?") 
                 self.top_ui_package_name_var = "(None)"
                 self.top_ui_mode.set("Normal")
                 return
@@ -517,6 +553,7 @@ class MainWindow():
         if self.top_ui_auto_package_var.get() == 1:
             self.root.after(25, self.call_screenshoter)
  
+
     def package_info(self):
         try:
             self.package_info_window.destroy()
@@ -546,7 +583,7 @@ class MainWindow():
 
             """
             image_object = Image.open("/home/barry/Downloads/silber_test2.png")
-            self.grabbed_images.append(image_object)       
+            self.grabbed_images.append(image_object)
             self.call_screenshoter()
             """
 
@@ -556,32 +593,30 @@ class MainWindow():
             game_name_l = ttk.Label(piw, text="Game Name:").grid(row=0, column=0, sticky="W")
             game_name = ttk.Label(piw, text=game_name_v).grid(row=0, column=1, columnspan=1, sticky="W")
             author_l = ttk.Label(piw, text="Author:").grid(row=1, column=0, sticky="W")
-            author = ttk.Label(piw, text=author_v).grid(row=1, column=1, columnspan=1,sticky="W")
+            author = ttk.Label(piw, text=author_v).grid(row=1, column=1, columnspan=1, sticky="W")
             version_l = ttk.Label(piw, text="Version:").grid(row=2, column=0, sticky="W")
-            version = ttk.Label(piw, text=version_v).grid(row=2, column=1, columnspan=1,sticky="W")
-
+            version = ttk.Label(piw, text=version_v).grid(row=2, column=1, columnspan=1, sticky="W")
             api_version_l = ttk.Label(piw, text="API Version:").grid(row=3, column=0, sticky="W")
-            api_version = ttk.Label(piw, text=api_version_v).grid(row=3, column=1, columnspan=1,sticky="W")
-
-
+            api_version = ttk.Label(piw, text=api_version_v).grid(row=3, column=1, columnspan=1, sticky="W")
+            
             #source_l = ttk.Label(piw, text="Source Language:").grid(row=3, column=0, sticky="W")
             #source = ttk.Label(piw, text="(De)").grid(row=3, column=1, columnspan=1, sticky="W")
             #target_l = ttk.Label(piw, text="Target Language:").grid(row=4, column=0, sticky="W")
-            #target = ttk.Label(piw, text="(En)").grid(row=4, column=1, columnspan=1,sticky="W")
-            #spacer:
+            #target = ttk.Label(piw, text="(En)").grid(row=4, column=1, columnspan=1, sticky="W")
+            #spacer
             ttk.Label(piw, text="").grid(row=5)
-
             desc_l = ttk.Label(piw, text="Description:").grid(row=6, column=0, sticky="W")
             desc = ttk.Label(piw, text=description_v, wraplength=320, justify="left").grid(
                     row=7, column=0, columnspan=2, sticky="W")
-       
+
         x, y = self.root.winfo_x(), self.root.winfo_y()
         w, h = self.root.winfo_width(), self.root.winfo_height()
         w2, h2 = 3*w/4, 3*h/4
         x2, y2 = x+w2/8, y+h2/8
- 
+
         #w2, h2 = piw.winfo_width, piw.winfo_height()
         piw.geometry(str(w2)+"x"+str(h2)+"+"+str(x2)+"+"+str(y2))
+
 
     def close_package(self):
         self.top_ui_auto_package['state'] = 'disabled'
@@ -609,17 +644,17 @@ class MainWindow():
         if not key_input.read_queue.empty():
             scancode, ascii = key_input.read_queue.get()
             ##print [scancode, ascii]
-            if scancode == config.keycode_capture:#41
+            if scancode == config.keycode_capture or ascii == config.ascii_capture:#41
                 print "Capture"
                 if self.temp_call == "":
                     self.temp_call = "active"
                 if self.package_object and self.top_ui_auto_package_var.get() == 1:
                     self.temp_call = ""
                 self.call_screenshoter()
-            elif scancode == config.keycode_prev:#2
+            elif scancode == config.keycode_prev or ascii == config.ascii_prev:#2
                 print "Prev"
                 self.left_image()
-            elif scancode == config.keycode_next:#3
+            elif scancode == config.keycode_next or ascii == config.ascii_next:#3
                 print "Next"
                 self.right_image()
             
@@ -640,8 +675,7 @@ def main():
         except:
             pass
         return
-    text_draw.load_font(config.user_font)
-
+    imaging.load_font(config.user_font)
     window = MainWindow()
     window.mainframe.pack(anchor=W)
     window.imageframe.pack(fill=BOTH, expand=YES)
@@ -661,7 +695,6 @@ def main():
         key_input.queue_executor.kill_queue()
         key_input.quit_pipe()
         api_service.kill_api_server()
-
   
 
 if __name__=='__main__':
