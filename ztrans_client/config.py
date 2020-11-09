@@ -1,5 +1,6 @@
 import json
 
+version_string = "1.03"
 server_host = "barry-mac"#"172.20.10.3"
 server_port = 8888
 user_api_key = ""
@@ -16,7 +17,13 @@ keycode_capture = 41
 keycode_prev = 2
 keycode_next = 3
 
-user_langs = ["Auto", "En", "De", "Fr", "Es", "Ja"]
+ascii_capture = '`'
+ascii_prev = '1'
+ascii_next = '2'
+
+capture_mode = "fast"
+
+user_langs = ["En", "De", "Fr", "Es", "Ja"]
 user_font = "RobotoCondensed-Bold.ttf"
 
 ocr_output = ["image"]
@@ -37,6 +44,13 @@ def load_init():
     global keycode_capture
     global keycode_prev
     global keycode_next
+
+    global capture_mode
+
+    global ascii_capture# = 246
+    global ascii_prev# = 49
+    global ascii_next# = 50
+
 
     global user_langs
     global user_font
@@ -80,6 +94,13 @@ def load_init():
     if "keycode_next" in config_file:
         keycode_next = config_file['keycode_next']
 
+    if "ascii_capture" in config_file:
+        ascii_capture = config_file['ascii_capture']
+    if "ascii_prev" in config_file:
+        ascii_prev = config_file['ascii_prev']
+    if "ascii_next" in config_file:
+        ascii_next = config_file['ascii_next']
+
     if "user_langs" in config_file:
         user_langs = config_file['user_langs']
     if "user_font" in config_file:
@@ -88,10 +109,28 @@ def load_init():
     if "ocr_output" in config_file:
         ocr_output = config_file['ocr_output']
 
+    if "capture_mode" in config_file:
+        capture_mode = config_file['capture_mode']
+
     print "config loaded"
     print "===================="
     #print user_api_key
     return True
+
+def set_config(key, value):
+    global ascii_capture
+    global ascii_prev
+    global ascii_next
+    global capture_mode
+    if key == "ascii_capture":
+        ascii_capture = value
+    elif key == "ascii_prev":
+        ascii_prev = value
+    elif key == "ascii_next":
+        ascii_next = value
+    elif key == "capture_mode":
+        capture_mode = value
+    write_init()
 
 def write_init():
     obj = {"server_host": server_host,
@@ -108,7 +147,11 @@ def write_init():
            "keycode_prev": keycode_prev,
            "keycode_next": keycode_next,
            "user_langs": user_langs,
-           "user_font": user_font
+           "user_font": user_font,
+           "capture_mode": capture_mode,
+           "ascii_capture": ascii_capture,
+           "ascii_prev": ascii_prev,
+           "ascii_next": ascii_next
     }
     config_file = open("./config.json", "w")
     config_file.write(json.dumps(obj, indent=4))

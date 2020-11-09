@@ -1,5 +1,5 @@
 /*************************\
-*     ZTranslate v1.01    *
+*     ZTranslate v1.03    *
 *                         *
 *      By: Barry Rowe     *
 *                         *
@@ -17,9 +17,10 @@ At this point ztranslate will be grabing images from the window in
 focus.  Depending on the game, different rendering options might have
 to be used to ensure that it can grab the image, or grab the image
 faster.  For example, in the PPSSPP emulator, Direct 3D 9/11 will
-work, but Open GL/Vulkan will not (they give a black screen).  If
-your game doesn't work, there may be other work arounds until 
-ZTranslate can be updated.
+work when the capture mode is set to "Fast", but Open GL/Vulkan will
+not (they give a black screen).  In this case, setting the capture
+mode to "Accurate" will correctly grab the screen, though it will
+do so slower.  
 
 -------------------------
 How to Run Automatic Mode
@@ -36,8 +37,8 @@ on your internet speed and the size of the game window, this may take
 3-4 seconds or 10 seconds.
 
 Similiarily to package mode, if the client can't grab the game screen,
-then it won't be able to translate the window.  Modifing the video options
-may make it work.
+then it won't be able to translate the window.  Changing the capture mode
+or modifing the video options should make this work.
 
 
 -------------
@@ -75,6 +76,10 @@ Once installed, run ztranslate.sh to start.
 -----------
 Change log
 ----------- 
+
+v1.03:
+   -Added in better custom key support for binds
+   -Added in capture mode for more screen grabbing options
 
 v1.02:
    -Fixed window clipping bug (windows)

@@ -5,16 +5,15 @@ import base64
 import time
 import copy
 from bson import json_util
-from ztrans_common.file_package import FilePackageDirectDAO
 
-class PackageObject(FilePackageDirectDAO):
+class PackageObject:
     def __init__(self, filename=None, file_or_string=None):
-      try:
-        super(PackageObject, self).__init__("", "", font="", filename=filename)
-        
+      try:        
         #on windows, zipfile only seems to work for filename inputs and not file objects
-        return
-        """
+        if filename:
+            the_package_file = filename
+        else:
+            pass
         self.the_package_zip = zipfile.ZipFile(the_package_file, "r")
         self.info = json.loads(self.the_package_zip.read("info.json"))
         self.zip_name_list = self.the_package_zip.namelist()
@@ -43,13 +42,12 @@ class PackageObject(FilePackageDirectDAO):
                 ff.close() 
 
         self.variables = dict()
-        """
       except:
         import traceback
         traceback.print_exc()
         raise
 
-    """
+    
     def is_index_disabled(self, name):
         return self.index_is_disabled.get(name, False)
 
@@ -201,7 +199,7 @@ class PackageObject(FilePackageDirectDAO):
         else:
             results = list()
         return results
-    """
+    
     #rewrite this function
     def find_data_by_values(self, algo, hsv, pc):
         output = list()

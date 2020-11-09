@@ -3,7 +3,6 @@ import screen_grab
 import ocr_api
 import server_client
 import config
-
 mock_int = 0
 
 class CallScreenshots:

@@ -1,12 +1,16 @@
 import time
 import json
 from PIL import Image, ImageDraw
+
+from diff_block_algorithm import DiffBlockAlgorithm
+from moving_text_algorithm import MovingTextAlgorithm
+from util import load_image
 from pipeline_general_service import PipelineGeneralService
-from ztrans_common import text_draw
-from ztrans_common.image_util import load_image
+import imaging
 
 
 running_textboxes = list()    
+
 
 class PackageOCR:
     @classmethod
@@ -42,7 +46,6 @@ class MetaJson:
                     if cls.check_requirement(req, package):
                         for command in commands:
                             cls.run_command(command, package)
-
     @classmethod
     def check_requirement(cls, req, package):
         for cond in req:
@@ -62,6 +65,7 @@ class MetaJson:
                            elif subkey == "equal": 
                                if len(running_textboxes) != cond[key][subkey]:
                                    return False
+
         return True
 
     @classmethod
@@ -125,10 +129,9 @@ class TextBox:
             if textbox['start'] <= c_time <= textbox['end']:
                 bb = textbox['bounding_box']
                 #print textbox
-                text_draw.drawTextBox(draw, textbox['text'].get(target_lang), 
-                                      bb[0],bb[1], bb[2], bb[3], 
-                                      font=None, confid=1,
-                                      exact_font=textbox.get("font_size", 8))
+                imaging.drawTextBox(draw, textbox['text'].get(target_lang), 
+                                    bb[0],bb[1], bb[2], bb[3], 
+                                    font=None, confid=1, exact_font=textbox.get("font_size", 8))
             req = textbox.get("req", list())
             if time.time() <= textbox['end'] and cls.check_requirement(req, package):
                 new_textboxes.append(textbox)
